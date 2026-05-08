@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AI-powered Fake News Detector — Analyze news articles for authenticity, emotional manipulation, propaganda, and credibility using advanced machine learning." />
+  <title>AI Fake News Detector — Verify Before You Believe</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ============================================ -->
+  <!--  PARTICLES CANVAS — Background animation     -->
+  <!-- ============================================ -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- ============================================ -->
+  <!--  NAVBAR                                      -->
+  <!-- ============================================ -->
+  <nav id="navbar" class="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">FakeGuard<span class="logo-ai">AI</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#hero" class="nav-link active">Home</a></li>
+        <li><a href="#analyzer" class="nav-link">Analyze</a></li>
+        <li><a href="#live-news" class="nav-link">Live News</a></li>
+        <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+      </ul>
+      <!-- Theme Toggle -->
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon">🌙</span>
+      </button>
+      <!-- Hamburger Menu for mobile -->
+      <button id="hamburger" class="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ============================================ -->
+  <!--  HERO SECTION                                -->
+  <!-- ============================================ -->
+  <section id="hero" class="hero-section">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>AI-Powered Intelligence</span>
+      </div>
+      <!-- Typing animation wali heading -->
+      <h1 class="hero-title">
+        <span class="title-line">AI Fake News</span>
+        <span class="title-line gradient-text" id="typed-text"></span>
+        <span class="typing-cursor">|</span>
+      </h1>
+      <p class="hero-subtitle">
+        Harness the power of advanced machine learning to verify news authenticity,
+        detect emotional manipulation, and uncover AI-generated propaganda — all in seconds.
+      </p>
+      <div class="hero-buttons">
+        <a href="#analyzer" class="btn btn-primary" id="btn-analyze-hero">
+          <span class="btn-icon">⚡</span> Analyze News
+          <span class="btn-ripple"></span>
+        </a>
+        <a href="#how-it-works" class="btn btn-secondary" id="btn-learn-more">
+          <span class="btn-icon">◎</span> Learn More
+        </a>
+      </div>
+      <!-- Stats counters -->
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-number" data-target="50000">0</span>
+          <span class="stat-label">Articles Analyzed</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" data-target="97">0</span>
+          <span class="stat-label">% Accuracy</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" data-target="12">0</span>
+          <span class="stat-label">AI Models</span>
+        </div>
+      </div>
+    </div>
+    <!-- Floating orbit rings - decorative -->
+    <div class="hero-visual">
+      <div class="orbit-ring ring-1"></div>
+      <div class="orbit-ring ring-2"></div>
+      <div class="orbit-ring ring-3"></div>
+      <div class="core-glow"></div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!--  ANALYZER SECTION — Main functionality       -->
+  <!-- ============================================ -->
+  <section id="analyzer" class="analyzer-section">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Analysis Engine</span>
+        <h2 class="section-title">Analyze Any News</h2>
+        <p class="section-desc">Paste content, enter a URL, or upload a file — our AI will do the rest.</p>
+      </div>
+
+      <!-- Input Tabs -->
+      <div class="analyzer-card glass-card">
+        <div class="input-tabs" role="tablist">
+          <button class="tab-btn active" data-tab="paste" role="tab" id="tab-paste">
+            <span class="tab-icon">📝</span> Paste News
+          </button>
+          <button class="tab-btn" data-tab="url" role="tab" id="tab-url">
+            <span class="tab-icon">🔗</span> Paste URL
+          </button>
+          <button class="tab-btn" data-tab="upload" role="tab" id="tab-upload">
+            <span class="tab-icon">📂</span> Upload File
+          </button>
+        </div>
+
+        <!-- Tab: Paste News -->
+        <div class="tab-content active" id="content-paste">
+          <textarea
+            id="news-input"
+            class="news-textarea"
+            placeholder="Paste your news article here..."
+            rows="8"
+          ></textarea>
+        </div>
+
+        <!-- Tab: Paste URL -->
+        <div class="tab-content" id="content-url">
+          <div class="url-input-wrapper">
+            <span class="url-icon">🌐</span>
+            <input
+              type="url"
+              id="url-input"
+              class="url-input"
+              placeholder="https://example.com/article..."
+            />
+          </div>
+          <p class="url-hint">Enter a valid article URL to fetch and analyze its content.</p>
+        </div>
+
+        <!-- Tab: Upload File -->
+        <div class="tab-content" id="content-upload">
+          <div class="upload-zone" id="drop-zone">
+            <div class="upload-icon">☁️</div>
+            <p class="upload-text">Drag & drop a text file here</p>
+            <p class="upload-hint">or click to browse — Supports .txt, .md, .doc</p>
+            <input type="file" id="file-input" accept=".txt,.md,.doc,.docx" hidden />
+            <span class="file-name" id="file-name"></span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="analyzer-actions">
+          <button class="btn btn-primary btn-analyze" id="btn-analyze">
+            <span class="btn-icon">🔍</span> Analyze
+            <span class="btn-ripple"></span>
+          </button>
+          <button class="btn btn-ghost" id="btn-clear">
+            <span class="btn-icon">✕</span> Clear
+          </button>
+          <button class="btn btn-ghost" id="btn-example">
+            <span class="btn-icon">📄</span> Example News
+          </button>
+          <!-- Voice Input Button -->
+          <button class="btn btn-ghost" id="btn-voice">
+            <span class="btn-icon">🎙️</span> Voice Input
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading Animation -->
+      <div class="loading-overlay" id="loading-overlay">
+        <div class="loader-container">
+          <div class="ai-loader">
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <span class="loader-text">Analyzing...</span>
+          </div>
+          <p class="loader-status" id="loader-status">Initializing AI model...</p>
+        </div>
+      </div>
+
+      <!-- ======================================== -->
+      <!--  RESULTS SECTION                         -->
+      <!-- ======================================== -->
+      <div class="results-section" id="results-section" style="display:none;">
+        <!-- Top Row: Prediction + Confidence -->
+        <div class="results-grid-top">
+          <!-- Prediction Card -->
+          <div class="result-card glass-card prediction-card" id="prediction-card">
+            <div class="card-header">
+              <span class="card-icon">⚖️</span>
+              <h3>Verdict</h3>
+            </div>
+            <div class="prediction-badge" id="prediction-badge">
+              <span class="prediction-label" id="prediction-label">—</span>
+            </div>
+            <p class="prediction-subtitle" id="prediction-subtitle"></p>
+          </div>
+
+          <!-- Confidence Meter -->
+          <div class="result-card glass-card confidence-card">
+            <div class="card-header">
+              <span class="card-icon">📊</span>
+              <h3>Confidence</h3>
+            </div>
+            <div class="circular-meter-wrapper">
+              <svg class="circular-meter" viewBox="0 0 200 200" id="confidence-meter">
+                <circle class="meter-bg" cx="100" cy="100" r="85" />
+                <circle class="meter-fill" cx="100" cy="100" r="85" id="meter-fill" />
+                <text x="100" y="100" class="meter-text" id="meter-text">0%</text>
+                <text x="100" y="125" class="meter-sublabel">Confidence</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Credibility Score -->
+          <div class="result-card glass-card credibility-card">
+            <div class="card-header">
+              <span class="card-icon">🛡️</span>
+              <h3>Source Credibility</h3>
+            </div>
+            <div class="trust-bar-wrapper">
+              <div class="trust-bar">
+                <div class="trust-fill" id="trust-fill"></div>
+              </div>
+              <span class="trust-score" id="trust-score">0%</span>
+            </div>
+            <p class="trust-label" id="trust-label">Checking...</p>
+          </div>
+        </div>
+
+        <!-- AI Reasoning -->
+        <div class="result-card glass-card reasoning-card">
+          <div class="card-header">
+            <span class="card-icon">🧠</span>
+            <h3>AI Reasoning</h3>
+          </div>
+          <p class="reasoning-text" id="reasoning-text"></p>
+        </div>
+
+        <!-- Manipulation & Emotion Detection -->
+        <div class="results-grid-mid">
+          <div class="result-card glass-card manipulation-card">
+            <div class="card-header">
+              <span class="card-icon">🎭</span>
+              <h3>Manipulation Detection</h3>
+            </div>
+            <div class="manipulation-tags" id="manipulation-tags"></div>
+          </div>
+
+          <!-- Emotion Intensity Chart -->
+          <div class="result-card glass-card emotion-card">
+            <div class="card-header">
+              <span class="card-icon">💢</span>
+              <h3>Emotion Intensity</h3>
+            </div>
+            <canvas id="emotion-chart" width="400" height="220"></canvas>
+          </div>
+        </div>
+
+        <!-- Sentence Highlighting -->
+        <div class="result-card glass-card highlight-card">
+          <div class="card-header">
+            <span class="card-icon">🔎</span>
+            <h3>Suspicious Sentences</h3>
+          </div>
+          <div class="highlighted-text" id="highlighted-text"></div>
+        </div>
+
+        <!-- Fact Check Suggestions -->
+        <div class="result-card glass-card factcheck-card">
+          <div class="card-header">
+            <span class="card-icon">✅</span>
+            <h3>Fact-Check Suggestions</h3>
+          </div>
+          <ul class="factcheck-list" id="factcheck-list"></ul>
+        </div>
+
+        <!-- Export Button -->
+        <div class="results-actions">
+          <button class="btn btn-primary" id="btn-export-pdf">
+            <span class="btn-icon">📄</span> Export PDF Report
+          </button>
+          <button class="btn btn-ghost" id="btn-new-analysis">
+            <span class="btn-icon">🔄</span> New Analysis
+          </button>
+        </div>
+      <!-- ======================================== -->
+      <!--  HISTORY SECTION (Bonus)               -->
+      <!-- ======================================== -->
+      <div class="history-section" id="history-section" style="display:none; margin-top: 4rem;">
+        <div class="section-header">
+          <span class="section-tag">Audit Trail</span>
+          <h2 class="section-title">Analysis History</h2>
+          <p class="section-desc">Review your past news authenticity checks.</p>
+        </div>
+        <div class="history-list" id="history-list" style="display: flex; flex-direction: column; gap: 1rem; max-width: 800px; margin: 0 auto;">
+          <!-- History items will be added here -->
+        </div>
+        <div style="text-align: center; margin-top: 2rem;">
+          <button class="btn btn-ghost" id="btn-clear-history">
+            <span class="btn-icon">🗑️</span> Clear History
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!--  LIVE NEWS SECTION                           -->
+  <!-- ============================================ -->
+  <section id="live-news" class="live-news-section">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Live Intelligence</span>
+        <h2 class="section-title">Trending News Feed</h2>
+        <p class="section-desc">Real-time news with AI trust badges — know what to believe.</p>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="news-controls glass-card">
+        <div class="news-search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="news-search" class="news-search" placeholder="Search news..." />
+        </div>
+        <div class="news-filters">
+          <select id="news-category" class="news-filter-select">
+            <option value="general">General</option>
+            <option value="technology">Technology</option>
+            <option value="science">Science</option>
+            <option value="health">Health</option>
+            <option value="business">Business</option>
+            <option value="sports">Sports</option>
+            <option value="entertainment">Entertainment</option>
+          </select>
+          <select id="news-trust-filter" class="news-filter-select">
+            <option value="all">All Trust Levels</option>
+            <option value="high">High Trust (70%+)</option>
+            <option value="medium">Medium Trust (40-70%)</option>
+            <option value="low">Low Trust (&lt;40%)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- News Grid -->
+      <div class="news-grid" id="news-grid">
+        <!-- Dynamically populated by JS -->
+      </div>
+      <div class="news-loading" id="news-loading" style="display:none;">
+        <div class="mini-loader"></div>
+        <span>Fetching latest news...</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!--  HOW IT WORKS SECTION                        -->
+  <!-- ============================================ -->
+  <section id="how-it-works" class="how-section">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Under The Hood</span>
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-desc">Our multi-layered AI pipeline ensures maximum accuracy.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card glass-card" data-step="1">
+          <div class="step-number">01</div>
+          <div class="step-icon">📥</div>
+          <h3>Input</h3>
+          <p>Paste text, URL, or upload a file. Our system accepts multiple formats.</p>
+        </div>
+        <div class="step-card glass-card" data-step="2">
+          <div class="step-number">02</div>
+          <div class="step-icon">🧹</div>
+          <h3>Preprocessing</h3>
+          <p>Text is cleaned, tokenized, and vectorized using TF-IDF for ML consumption.</p>
+        </div>
+        <div class="step-card glass-card" data-step="3">
+          <div class="step-number">03</div>
+          <div class="step-icon">🤖</div>
+          <h3>AI Analysis</h3>
+          <p>Multiple models — classification, emotion, propaganda — work in parallel.</p>
+        </div>
+        <div class="step-card glass-card" data-step="4">
+          <div class="step-number">04</div>
+          <div class="step-icon">📊</div>
+          <h3>Report</h3>
+          <p>Get a comprehensive report with confidence scores, reasoning, and suggestions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!--  FOOTER                                      -->
+  <!-- ============================================ -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">FakeGuard<span class="logo-ai">AI</span></span>
+        <p class="footer-tagline">Verify before you believe.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#hero">Home</a>
+        <a href="#analyzer">Analyze</a>
+        <a href="#live-news">Live News</a>
+        <a href="#how-it-works">How It Works</a>
+      </div>
+      <p class="footer-copy">&copy; 2026 FakeGuardAI. Built with intelligence.</p>
+    </div>
+  </footer>
+
+  <!-- ============================================ -->
+  <!--  AI CHATBOT ASSISTANT                        -->
+  <!-- ============================================ -->
+  <div class="chatbot-toggle" id="chatbot-toggle">
+    <span>🤖</span>
+  </div>
+  <div class="chatbot-window glass-card" id="chatbot-window" style="display:none;">
+    <div class="chatbot-header">
+      <span>🤖 FakeGuard Assistant</span>
+      <button class="chatbot-close" id="chatbot-close">✕</button>
+    </div>
+    <div class="chatbot-messages" id="chatbot-messages">
+      <div class="chat-msg bot">Hi! I'm FakeGuard AI. Ask me anything about fake news detection. 🛡️</div>
+    </div>
+    <div class="chatbot-input-wrapper">
+      <input type="text" id="chatbot-input" class="chatbot-input" placeholder="Ask something..." />
+      <button class="chatbot-send" id="chatbot-send">➤</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
