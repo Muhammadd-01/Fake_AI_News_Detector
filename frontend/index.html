@@ -5,20 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="AI-powered Fake News Detector — Analyze news articles for authenticity, emotional manipulation, propaganda, and credibility using advanced machine learning." />
   <title>AI Fake News Detector — Verify Before You Believe</title>
-  <!-- Google Fonts -->
+  <!-- Google Fonts import kiye gaye hain -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- CSS file link ki hai -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <!-- ============================================ -->
-  <!--  PARTICLES CANVAS — Background animation     -->
+  <!--  PARTICLES CANVAS — Background mein chalti hui animation -->
   <!-- ============================================ -->
   <canvas id="particles-canvas"></canvas>
 
   <!-- ============================================ -->
-  <!--  NAVBAR                                      -->
+  <!--  NAVBAR — Menu bar aur Logo -->
   <!-- ============================================ -->
   <nav id="navbar" class="navbar">
     <div class="nav-container">
@@ -26,17 +27,18 @@
         <span class="logo-icon">◈</span>
         <span class="logo-text">FakeGuard<span class="logo-ai">AI</span></span>
       </a>
+      <!-- Menu links -->
       <ul class="nav-links">
         <li><a href="#hero" class="nav-link active">Home</a></li>
         <li><a href="#analyzer" class="nav-link">Analyze</a></li>
         <li><a href="#live-news" class="nav-link">Live News</a></li>
         <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
       </ul>
-      <!-- Theme Toggle -->
+      <!-- Dark mode aur light mode ka button -->
       <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
         <span class="theme-icon">🌙</span>
       </button>
-      <!-- Hamburger Menu for mobile -->
+      <!-- Mobile ke liye menu icon -->
       <button id="hamburger" class="hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
@@ -44,7 +46,7 @@
   </nav>
 
   <!-- ============================================ -->
-  <!--  HERO SECTION                                -->
+  <!--  HERO SECTION — Main front screen -->
   <!-- ============================================ -->
   <section id="hero" class="hero-section">
     <div class="hero-content">
@@ -52,7 +54,7 @@
         <span class="badge-dot"></span>
         <span>AI-Powered Intelligence</span>
       </div>
-      <!-- Typing animation wali heading -->
+      <!-- Typing animation wali heading (AI Fake News Detector wagaira likha ata hai) -->
       <h1 class="hero-title">
         <span class="title-line">AI Fake News</span>
         <span class="title-line gradient-text" id="typed-text"></span>
@@ -62,6 +64,7 @@
         Harness the power of advanced machine learning to verify news authenticity,
         detect emotional manipulation, and uncover AI-generated propaganda — all in seconds.
       </p>
+      <!-- Buttons -->
       <div class="hero-buttons">
         <a href="#analyzer" class="btn btn-primary" id="btn-analyze-hero">
           <span class="btn-icon">⚡</span> Analyze News
@@ -71,7 +74,7 @@
           <span class="btn-icon">◎</span> Learn More
         </a>
       </div>
-      <!-- Stats counters -->
+      <!-- Stats counters (Numbers barhte hue nazar aate hain) -->
       <div class="hero-stats">
         <div class="stat-item">
           <span class="stat-number" data-target="50000">0</span>
@@ -87,7 +90,7 @@
         </div>
       </div>
     </div>
-    <!-- Floating orbit rings - decorative -->
+    <!-- Floating rings (sirf design ke liye) -->
     <div class="hero-visual">
       <div class="orbit-ring ring-1"></div>
       <div class="orbit-ring ring-2"></div>
@@ -97,7 +100,7 @@
   </section>
 
   <!-- ============================================ -->
-  <!--  ANALYZER SECTION — Main functionality       -->
+  <!--  ANALYZER SECTION — Jahan news paste karni hai -->
   <!-- ============================================ -->
   <section id="analyzer" class="analyzer-section">
     <div class="section-container">
@@ -107,7 +110,7 @@
         <p class="section-desc">Paste content, enter a URL, or upload a file — our AI will do the rest.</p>
       </div>
 
-      <!-- Input Tabs -->
+      <!-- Input Tabs (Paste, URL, ya Upload) -->
       <div class="analyzer-card glass-card">
         <div class="input-tabs" role="tablist">
           <button class="tab-btn active" data-tab="paste" role="tab" id="tab-paste">
@@ -121,7 +124,7 @@
           </button>
         </div>
 
-        <!-- Tab: Paste News -->
+        <!-- Tab 1: News Paste karne ka area -->
         <div class="tab-content active" id="content-paste">
           <textarea
             id="news-input"
@@ -131,7 +134,7 @@
           ></textarea>
         </div>
 
-        <!-- Tab: Paste URL -->
+        <!-- Tab 2: URL paste karne ka area -->
         <div class="tab-content" id="content-url">
           <div class="url-input-wrapper">
             <span class="url-icon">🌐</span>
@@ -145,7 +148,7 @@
           <p class="url-hint">Enter a valid article URL to fetch and analyze its content.</p>
         </div>
 
-        <!-- Tab: Upload File -->
+        <!-- Tab 3: File upload karne ka area -->
         <div class="tab-content" id="content-upload">
           <div class="upload-zone" id="drop-zone">
             <div class="upload-icon">☁️</div>
@@ -156,7 +159,7 @@
           </div>
         </div>
 
-        <!-- Action Buttons -->
+        <!-- Action Buttons (Analyze, Clear, Example) -->
         <div class="analyzer-actions">
           <button class="btn btn-primary btn-analyze" id="btn-analyze">
             <span class="btn-icon">🔍</span> Analyze
@@ -168,14 +171,14 @@
           <button class="btn btn-ghost" id="btn-example">
             <span class="btn-icon">📄</span> Example News
           </button>
-          <!-- Voice Input Button -->
+          <!-- Mike se bol kar input dene ka button -->
           <button class="btn btn-ghost" id="btn-voice">
             <span class="btn-icon">🎙️</span> Voice Input
           </button>
         </div>
       </div>
 
-      <!-- Loading Animation -->
+      <!-- Loading Animation (Jab AI kaam kar raha ho) -->
       <div class="loading-overlay" id="loading-overlay">
         <div class="loader-container">
           <div class="ai-loader">
@@ -189,12 +192,12 @@
       </div>
 
       <!-- ======================================== -->
-      <!--  RESULTS SECTION                         -->
+      <!--  RESULTS SECTION — AI Results yahan aayenge -->
       <!-- ======================================== -->
       <div class="results-section" id="results-section" style="display:none;">
-        <!-- Top Row: Prediction + Confidence -->
+        <!-- Prediction (Verdict) aur Confidence meter -->
         <div class="results-grid-top">
-          <!-- Prediction Card -->
+          <!-- Verdict (Real/Fake) -->
           <div class="result-card glass-card prediction-card" id="prediction-card">
             <div class="card-header">
               <span class="card-icon">⚖️</span>
@@ -206,7 +209,7 @@
             <p class="prediction-subtitle" id="prediction-subtitle"></p>
           </div>
 
-          <!-- Confidence Meter -->
+          <!-- Confidence Meter (Gol ghoomta hua meter) -->
           <div class="result-card glass-card confidence-card">
             <div class="card-header">
               <span class="card-icon">📊</span>
@@ -222,7 +225,7 @@
             </div>
           </div>
 
-          <!-- Credibility Score -->
+          <!-- Credibility Score (Progress bar) -->
           <div class="result-card glass-card credibility-card">
             <div class="card-header">
               <span class="card-icon">🛡️</span>
@@ -238,7 +241,7 @@
           </div>
         </div>
 
-        <!-- AI Reasoning -->
+        <!-- AI Reasoning (AI batayega kyun ye result diya) -->
         <div class="result-card glass-card reasoning-card">
           <div class="card-header">
             <span class="card-icon">🧠</span>
@@ -247,8 +250,9 @@
           <p class="reasoning-text" id="reasoning-text"></p>
         </div>
 
-        <!-- Manipulation & Emotion Detection -->
+        <!-- Manipulation aur Emotions ka area -->
         <div class="results-grid-mid">
+          <!-- Manipulation Tags -->
           <div class="result-card glass-card manipulation-card">
             <div class="card-header">
               <span class="card-icon">🎭</span>
@@ -257,7 +261,7 @@
             <div class="manipulation-tags" id="manipulation-tags"></div>
           </div>
 
-          <!-- Emotion Intensity Chart -->
+          <!-- Emotion Chart (Bar chart) -->
           <div class="result-card glass-card emotion-card">
             <div class="card-header">
               <span class="card-icon">💢</span>
@@ -267,7 +271,7 @@
           </div>
         </div>
 
-        <!-- Sentence Highlighting -->
+        <!-- Suspicious Sentences Highlighting -->
         <div class="result-card glass-card highlight-card">
           <div class="card-header">
             <span class="card-icon">🔎</span>
@@ -285,7 +289,7 @@
           <ul class="factcheck-list" id="factcheck-list"></ul>
         </div>
 
-        <!-- Export Button -->
+        <!-- Export aur New Analysis buttons -->
         <div class="results-actions">
           <button class="btn btn-primary" id="btn-export-pdf">
             <span class="btn-icon">📄</span> Export PDF Report
@@ -294,29 +298,29 @@
             <span class="btn-icon">🔄</span> New Analysis
           </button>
         </div>
-      <!-- ======================================== -->
-      <!--  HISTORY SECTION (Bonus)               -->
-      <!-- ======================================== -->
-      <div class="history-section" id="history-section" style="display:none; margin-top: 4rem;">
-        <div class="section-header">
-          <span class="section-tag">Audit Trail</span>
-          <h2 class="section-title">Analysis History</h2>
-          <p class="section-desc">Review your past news authenticity checks.</p>
-        </div>
-        <div class="history-list" id="history-list" style="display: flex; flex-direction: column; gap: 1rem; max-width: 800px; margin: 0 auto;">
-          <!-- History items will be added here -->
-        </div>
-        <div style="text-align: center; margin-top: 2rem;">
-          <button class="btn btn-ghost" id="btn-clear-history">
-            <span class="btn-icon">🗑️</span> Clear History
-          </button>
+
+        <!-- Analysis History Section -->
+        <div class="history-section" id="history-section" style="display:none; margin-top: 4rem;">
+          <div class="section-header">
+            <span class="section-tag">Audit Trail</span>
+            <h2 class="section-title">Analysis History</h2>
+            <p class="section-desc">Review your past news authenticity checks.</p>
+          </div>
+          <div class="history-list" id="history-list" style="display: flex; flex-direction: column; gap: 1rem; max-width: 800px; margin: 0 auto;">
+            <!-- History items JavaScript se yahan aayenge -->
+          </div>
+          <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn btn-ghost" id="btn-clear-history">
+              <span class="btn-icon">🗑️</span> Clear History
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ============================================ -->
-  <!--  LIVE NEWS SECTION                           -->
+  <!--  LIVE NEWS SECTION — Latest khabrein -->
   <!-- ============================================ -->
   <section id="live-news" class="live-news-section">
     <div class="section-container">
@@ -326,7 +330,7 @@
         <p class="section-desc">Real-time news with AI trust badges — know what to believe.</p>
       </div>
 
-      <!-- Search & Filters -->
+      <!-- Search aur Filter karne ke options -->
       <div class="news-controls glass-card">
         <div class="news-search-wrapper">
           <span class="search-icon">🔍</span>
@@ -351,9 +355,9 @@
         </div>
       </div>
 
-      <!-- News Grid -->
+      <!-- Khabron ka grid -->
       <div class="news-grid" id="news-grid">
-        <!-- Dynamically populated by JS -->
+        <!-- Khabrein JavaScript se yahan load hongi -->
       </div>
       <div class="news-loading" id="news-loading" style="display:none;">
         <div class="mini-loader"></div>
@@ -363,7 +367,7 @@
   </section>
 
   <!-- ============================================ -->
-  <!--  HOW IT WORKS SECTION                        -->
+  <!--  HOW IT WORKS SECTION — System kaise kaam karta hai -->
   <!-- ============================================ -->
   <section id="how-it-works" class="how-section">
     <div class="section-container">
@@ -402,7 +406,7 @@
   </section>
 
   <!-- ============================================ -->
-  <!--  FOOTER                                      -->
+  <!--  FOOTER — Niche wala hissa -->
   <!-- ============================================ -->
   <footer class="footer">
     <div class="footer-container">
@@ -422,7 +426,7 @@
   </footer>
 
   <!-- ============================================ -->
-  <!--  AI CHATBOT ASSISTANT                        -->
+  <!--  AI CHATBOT ASSISTANT — Help ke liye bot -->
   <!-- ============================================ -->
   <div class="chatbot-toggle" id="chatbot-toggle">
     <span>🤖</span>
@@ -441,6 +445,8 @@
     </div>
   </div>
 
+  <!-- JavaScript file link ki hai -->
   <script src="script.js"></script>
 </body>
 </html>
+

@@ -1,12 +1,14 @@
 # ============================================
 # FakeGuardAI - Training Script
-# Yeh script model ko train karta hai dataset pe
-# Pehle dataset/ folder mein Fake.csv aur True.csv daalein
+# Yeh script AI model ko train karne ke liye hai.
+# Pehle backend/dataset/ folder mein Fake.csv aur True.csv file dalein.
+# Phir ye script run karein: python train.py
 # ============================================
 
 from model import FakeNewsDetector
 
 if __name__ == '__main__':
+    # Console pe heading print karo
     print('=' * 50)
     print('  FakeGuardAI - Model Training')
     print('=' * 50)
@@ -14,12 +16,14 @@ if __name__ == '__main__':
     print('📂 Make sure Fake.csv and True.csv are in backend/dataset/')
     print()
 
-    # Detector initialize karo
+    # 1. Detector class ka object banao.
     detector = FakeNewsDetector()
 
-    # Train karo
+    # 2. Training process start karo.
+    # Ye function model.py mein defined hai.
     success = detector.train()
 
+    # 3. Result check karo ke training kamyab rahi ya nahi.
     if success:
         print()
         print('✅ Training complete! Model saved.')
@@ -32,3 +36,4 @@ if __name__ == '__main__':
         print('🔄 Then run this script again.')
         print()
         print('🚀 You can still run: python app.py (rule-based mode)')
+
