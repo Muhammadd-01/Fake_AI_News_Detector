@@ -1,23 +1,18 @@
 // ============================================
-//FakeGuardAI - Main JavaScript
-// Yahan frontend ki saari logic hai: Animations, API calls, aur UI updates.
+// FakeGuardAI - Main JavaScript
 // ============================================
 
 const API_BASE = 'http://127.0.0.1:5001';
 
 // ===== BACKGROUND PARTICLES =====
-// Background mein jo chotay sitaray (particles) ghoom rahay hain unka code.
 (function initParticles() {
   const canvas = document.getElementById('particles-canvas');
   const ctx = canvas.getContext('2d');
   let particles = [];
-  
-  // Canvas ko poori screen pe set karo.
   function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   resize();
   window.addEventListener('resize', resize);
 
-  // Particles banao (80 particles total).
   for (let i = 0; i < 80; i++) {
     particles.push({
       x: Math.random() * canvas.width, y: Math.random() * canvas.height,
@@ -26,19 +21,14 @@ const API_BASE = 'http://127.0.0.1:5001';
     });
   }
 
-  // Draw karne ka function jo har frame pe chalta hai.
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach((p, i) => {
       p.x += p.vx; p.y += p.vy;
-      // Screen ke kinaro se takra kar wapis ayen.
       if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
       if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-      
       ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(0,245,255,${p.o})`; ctx.fill();
-      
-      // Agar do particles kareeb hon toh unke darmiyan line khincho.
       for (let j = i + 1; j < particles.length; j++) {
         const dx = p.x - particles[j].x, dy = p.y - particles[j].y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -54,12 +44,10 @@ const API_BASE = 'http://127.0.0.1:5001';
 })();
 
 // ===== TYPING ANIMATION =====
-// Hero section mein jo text "Detector", "Analyzer" wagaira likha ata hai.
 (function initTyping() {
   const words = ['Detector', 'Analyzer', 'Shield', 'Guardian'];
   const el = document.getElementById('typed-text');
   let wi = 0, ci = 0, deleting = false;
-
   function type() {
     const word = words[wi];
     if (!deleting) {
@@ -74,8 +62,7 @@ const API_BASE = 'http://127.0.0.1:5001';
   type();
 })();
 
-// ===== STATS COUNTER ANIMATION =====
-// Hero section mein jo numbers (50,000+, 97% etc) barhte hue nazar aate hain.
+// ===== STATS COUNTER =====
 (function initCounters() {
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -98,25 +85,12 @@ const API_BASE = 'http://127.0.0.1:5001';
   if (stats) observer.observe(stats);
 })();
 
-// ===== SCROLL REVEAL =====
-// Scroll karne pe cards aur elements ka fade-in effect.
-(function initReveal() {
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.result-card, .step-card, .section-header').forEach(el => {
-    el.classList.add('reveal'); obs.observe(el);
-  });
-})();
-
-// ===== NAVBAR LOGIC =====
-// Mobile menu (hamburger) aur active link highlights.
+// ===== NAVBAR & THEME =====
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.querySelector('.nav-links');
 hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
 document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', () => navLinks.classList.remove('open')));
 
-// Scroll pe check karo ke kaunsa section samnay hai taake link highlight ho sakay.
 window.addEventListener('scroll', () => {
   const sections = document.querySelectorAll('section[id]');
   let current = '';
@@ -126,7 +100,6 @@ window.addEventListener('scroll', () => {
   });
 });
 
-// ===== DARK / LIGHT MODE =====
 const themeBtn = document.getElementById('theme-toggle');
 themeBtn.addEventListener('click', () => {
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
@@ -134,104 +107,53 @@ themeBtn.addEventListener('click', () => {
   themeBtn.querySelector('.theme-icon').textContent = isLight ? '🌙' : '☀️';
 });
 
-// ===== ANALYZER TABS =====
-// Input methods ke darmian switch karna (Paste, URL, Upload).
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(`content-${btn.dataset.tab}`).classList.add('active');
-  });
-});
-
-// ===== FILE UPLOAD LOGIC =====
-const dropZone = document.getElementById('drop-zone');
-const fileInput = document.getElementById('file-input');
-const fileName = document.getElementById('file-name');
-dropZone.addEventListener('click', () => fileInput.click());
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault(); dropZone.classList.remove('dragover');
-  if (e.dataTransfer.files.length) { fileInput.files = e.dataTransfer.files; fileName.textContent = e.dataTransfer.files[0].name; }
-});
-fileInput.addEventListener('change', () => { if (fileInput.files.length) fileName.textContent = fileInput.files[0].name; });
-
-// ===== EXAMPLE NEWS BUTTON =====
-// Dummy text load karta hai taake user test kar sakay.
+// ===== EXAMPLE URL =====
 document.getElementById('btn-example').addEventListener('click', () => {
-  document.querySelector('.tab-btn[data-tab="paste"]').click();
-  document.getElementById('news-input').value = `BREAKING: Scientists discover that drinking coffee makes you immortal! A secret government study, hidden for decades, has finally been leaked by an anonymous whistleblower. The study claims that just 3 cups of coffee per day can reverse aging and grant eternal life. Big Pharma has been suppressing this information to keep selling expensive medications. Share this before it gets deleted!`;
+  document.getElementById('url-input').value = 'https://www.bbc.com/news/articles/c4gzge8nyero';
 });
 
-// ===== CLEAR ALL INPUTS =====
+// ===== CLEAR INPUT =====
 document.getElementById('btn-clear').addEventListener('click', () => {
-  document.getElementById('news-input').value = '';
   document.getElementById('url-input').value = '';
-  fileInput.value = ''; fileName.textContent = '';
   document.getElementById('results-section').style.display = 'none';
 });
 
-// ===== VOICE INPUT (SPEECH TO TEXT) =====
-document.getElementById('btn-voice').addEventListener('click', () => {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Speech recognition not supported in this browser.'); return; }
-  const rec = new SR(); rec.lang = 'en-US'; rec.interimResults = false;
-  rec.onresult = e => {
-    document.querySelector('.tab-btn[data-tab="paste"]').click();
-    document.getElementById('news-input').value = e.results[0][0].transcript;
-  };
-  rec.start();
+// ===== ANALYZE FUNCTION =====
+document.getElementById('btn-analyze').addEventListener('click', analyze);
+document.getElementById('btn-new-analysis').addEventListener('click', () => {
+    document.getElementById('analyzer').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('url-input').focus();
 });
 
-// ===== MAIN ANALYZE FUNCTION =====
-// Backend API ko request bhejta hai aur results dikhata hai.
-document.getElementById('btn-analyze').addEventListener('click', analyze);
-
 async function analyze() {
-  const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
-  let text = '', endpoint = '/analyze', body = null, isFormData = false;
+  const url = document.getElementById('url-input').value.trim();
+  if (!url || !url.startsWith('http')) { alert('Please enter a valid URL.'); return; }
 
-  // Check karo ke kaunsa tab active hai aur data waisa banao.
-  if (activeTab === 'paste') {
-    text = document.getElementById('news-input').value.trim();
-    if (!text) { alert('Please paste some news text.'); return; }
-    body = JSON.stringify({ text });
-  } else if (activeTab === 'url') {
-    const url = document.getElementById('url-input').value.trim();
-    if (!url || !url.startsWith('http')) { alert('Please enter a valid URL.'); return; }
-    endpoint = '/analyze-url';
-    body = JSON.stringify({ url });
-  } else {
-    if (!fileInput.files.length) { alert('Please upload a file.'); return; }
-    endpoint = '/upload';
-    body = new FormData(); body.append('file', fileInput.files[0]);
-    isFormData = true;
-  }
-
-  // Loading animation dikhao.
   showLoading(true);
-  const statuses = ['Preprocessing text...', 'Running AI models...', 'Analyzing emotions...', 'Detecting propaganda...', 'Generating report...'];
+  const statuses = ['Fetching source...', 'Extracting metadata...', 'Checking domain reputation...', 'Analyzing content consistency...', 'Finalizing AI verdict...'];
   let si = 0;
   const statusInterval = setInterval(() => {
     si = (si + 1) % statuses.length;
     document.getElementById('loader-status').textContent = statuses[si];
-  }, 1500);
+  }, 1200);
 
   try {
-    const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
-    const res = await fetch(`${API_BASE}${endpoint}`, { method: 'POST', headers, body });
+    const res = await fetch(`${API_BASE}/analyze-url`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
     const data = await res.json();
     clearInterval(statusInterval);
     showLoading(false);
+    
+    if (data.error) { alert(data.error); return; }
     displayResults(data);
   } catch (err) {
-    // Agar server off hai toh demo results dikhao.
     clearInterval(statusInterval);
     showLoading(false);
-    console.warn('Backend unavailable, showing demo results:', err);
-    displayResults(generateDemoResults(activeTab === 'paste' ? document.getElementById('news-input').value : 'Sample article text'));
+    console.warn('Backend unavailable:', err);
+    alert('Server is currently offline. Please ensure the backend is running.');
   }
 }
 
@@ -241,46 +163,20 @@ function showLoading(show) {
   overlay.style.display = show ? 'flex' : 'none';
 }
 
-// ===== DEMO RESULTS (FALLBACK) =====
-// Agar server nahi chal raha toh ye function fake results banata hai sirf demo ke liye.
-function generateDemoResults(text) {
-  const clickbaitWords = ['BREAKING', 'SHOCKING', 'SECRET', 'EXPOSED', 'MUST SEE', 'URGENT', 'LEAKED', 'BANNED'];
-  const emotionalWords = ['fear', 'terrifying', 'dangerous', 'amazing', 'incredible', 'unbelievable', 'outrage', 'scandal'];
-  const upperText = (text || '').toUpperCase();
-  let clickbaitScore = 0, emotionScore = 0;
-  
-  clickbaitWords.forEach(w => { if (upperText.includes(w)) clickbaitScore += 15; });
-  emotionalWords.forEach(w => { if (upperText.toLowerCase().includes(w)) emotionScore += 10; });
-
-  const totalSuspicion = Math.min(clickbaitScore + emotionScore + 30, 98);
-  const isFake = totalSuspicion > 60;
-  const prediction = isFake ? 'Fake' : 'Real';
-  
-  return {
-    prediction, confidence: Math.round(isFake ? totalSuspicion : 100 - totalSuspicion),
-    reason: isFake ? 'Sensational language and clickbait detected.' : 'Text appears factual.',
-    manipulation: clickbaitScore > 10 ? ['Clickbait'] : ['None Detected'],
-    credibility: Math.max(5, 100 - totalSuspicion),
-    emotions: { fear: 40, anger: 30, manipulation: 50, hope: 20, sadness: 10 },
-    suspicious_sentences: ['Sample suspicious sentence.'],
-    suggestions: ['Verify from source.']
-  };
-}
-
-// ===== DISPLAY RESULTS IN UI =====
-// Backend se aye hue data ko page pe dikhata hai.
 function displayResults(data) {
   const section = document.getElementById('results-section');
   section.style.display = 'block';
   section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-  // 1. Verdict (Fake/Real) badge set karo.
+  // 1. Verdict Badge
   const badge = document.getElementById('prediction-badge');
   const label = document.getElementById('prediction-label');
+  const subtitle = document.getElementById('prediction-subtitle');
   badge.className = 'prediction-badge ' + (data.prediction || 'fake').toLowerCase();
   label.textContent = data.prediction || 'Unknown';
+  subtitle.textContent = data.metadata ? `Source: ${data.metadata.domain}` : '';
 
-  // 2. Confidence meter (SVG Circle) animate karo.
+  // 2. Confidence Meter
   const pct = data.confidence || 0;
   const circumference = 2 * Math.PI * 85;
   const offset = circumference - (pct / 100) * circumference;
@@ -289,12 +185,13 @@ function displayResults(data) {
   setTimeout(() => { fill.style.strokeDashoffset = offset; }, 100);
   document.getElementById('meter-text').textContent = pct + '%';
 
-  // 3. Credibility bar update karo.
+  // 3. Trust index
   const cred = data.credibility || 50;
   document.getElementById('trust-fill').style.width = cred + '%';
   document.getElementById('trust-score').textContent = cred + '%';
+  document.getElementById('trust-label').textContent = cred > 70 ? 'High Trust' : cred > 40 ? 'Moderate Risk' : 'High Risk';
 
-  // 4. Reasoning aur Manipulation tags.
+  // 4. Reasoning
   document.getElementById('reasoning-text').textContent = data.reason || '';
   const tagsEl = document.getElementById('manipulation-tags');
   tagsEl.innerHTML = '';
@@ -305,21 +202,19 @@ function displayResults(data) {
     tagsEl.appendChild(tag);
   });
 
-  // 5. Emotion bar chart draw karo.
   drawEmotionChart(data.emotions);
 
-  // 6. Suspicious sentences highlight karo.
+  // 5. Red Flags
   const hlEl = document.getElementById('highlighted-text');
   hlEl.innerHTML = '';
   (data.suspicious_sentences || []).forEach(s => {
-    const span = document.createElement('span');
-    span.className = 'suspicious';
-    span.textContent = s;
-    hlEl.appendChild(span);
-    hlEl.appendChild(document.createTextNode(' '));
+    const p = document.createElement('p');
+    p.className = 'suspicious-item';
+    p.textContent = `• ${s}`;
+    hlEl.appendChild(p);
   });
 
-  // 7. Suggestions list.
+  // 6. Verification Path
   const fcList = document.getElementById('factcheck-list');
   fcList.innerHTML = '';
   (data.suggestions || []).forEach(s => {
@@ -329,17 +224,15 @@ function displayResults(data) {
     fcList.appendChild(li);
   });
 
-  // History mein save karo.
   saveToHistory({
     prediction: data.prediction,
     confidence: data.confidence,
-    timestamp: new Date().toLocaleString(),
-    text: document.getElementById('news-input').value.substring(0, 80) + '...'
+    timestamp: new Date().toLocaleTimeString(),
+    url: document.getElementById('url-input').value
   });
 }
 
-// ===== HISTORY MANAGEMENT =====
-// Purani searches ko local storage mein save karta hai.
+// ===== HISTORY =====
 function saveToHistory(item) {
   let history = JSON.parse(localStorage.getItem('fakeguard_history') || '[]');
   history.unshift(item);
@@ -357,23 +250,24 @@ function renderHistory() {
   history.forEach(item => {
     const div = document.createElement('div');
     div.className = 'history-item glass-card';
-    div.innerHTML = `<div>${item.timestamp}</div><div><strong>${item.prediction}</strong> (${item.confidence}%)</div>`;
+    div.innerHTML = `<div>${item.timestamp}</div><div><strong>${item.prediction}</strong> (${item.confidence}%)</div><div class="hist-url">${item.url.substring(0, 40)}...</div>`;
     list.appendChild(div);
   });
 }
+document.getElementById('btn-clear-history').addEventListener('click', () => {
+    localStorage.removeItem('fakeguard_history');
+    document.getElementById('history-section').style.display = 'none';
+});
 
-// ===== EMOTION BAR CHART =====
-// Canvas API use karke jazbaat ka chart banata hai.
+// ===== CHART =====
 function drawEmotionChart(emotions) {
   const canvas = document.getElementById('emotion-chart');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
   ctx.clearRect(0, 0, w, h);
-
   const keys = Object.keys(emotions || {});
   const colors = ['#FF3D71', '#ff8c00', '#7B61FF', '#00F5FF', '#4ecdc4'];
-  
   keys.forEach((key, i) => {
     const val = emotions[key];
     const barH = (val / 100) * (h - 60);
@@ -386,60 +280,50 @@ function drawEmotionChart(emotions) {
   });
 }
 
-// ===== EXPORT PDF (PRINT) =====
-document.getElementById('btn-export-pdf').addEventListener('click', () => {
-  window.print();
-});
-
-// ===== LIVE NEWS FEED =====
-// Latest khabrein fetch karta hai (Simulated).
+// ===== NEWS FEED =====
 async function fetchNews() {
   const grid = document.getElementById('news-grid');
   if (!grid) return;
-  grid.innerHTML = '<p>Fetching news...</p>';
-  
+  grid.innerHTML = '<div class="news-loading-inline">Connecting to global news stream...</div>';
   setTimeout(() => {
     grid.innerHTML = '';
     const demoNews = [
       { title: 'Global Climate Summit 2026', trust: 85, source: 'BBC' },
       { title: 'New Mars Colony Successful', trust: 92, source: 'NASA' },
-      { title: 'Coffee Makes You Immortal!?', trust: 15, source: 'FakeWire' }
+      { title: 'AI Governance Treaty Signed', trust: 88, source: 'Reuters' }
     ];
     demoNews.forEach(n => {
       const card = document.createElement('div');
       card.className = 'news-card glass-card';
-      card.innerHTML = `<h4>${n.title}</h4><p>${n.source} · Trust: ${n.trust}%</p>`;
+      card.innerHTML = `<h4>${n.title}</h4><div class="news-meta"><span>${n.source}</span><span class="trust-badge">Trust: ${n.trust}%</span></div>`;
       grid.appendChild(card);
     });
   }, 1000);
 }
 fetchNews();
 
-// ===== CHATBOT LOGIC =====
+// ===== CHATBOT =====
 const chatToggle = document.getElementById('chatbot-toggle');
 const chatWindow = document.getElementById('chatbot-window');
 const chatInput = document.getElementById('chatbot-input');
 const chatSend = document.getElementById('chatbot-send');
 const chatMessages = document.getElementById('chatbot-messages');
-
-chatToggle.addEventListener('click', () => { 
-  chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none'; 
-});
-
-function addChatMsg(text, isUser) {
-  const div = document.createElement('div');
-  div.className = `chat-msg ${isUser ? 'user' : 'bot'}`;
-  div.textContent = text;
-  chatMessages.appendChild(div);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
+chatToggle.addEventListener('click', () => { chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none'; });
 chatSend.addEventListener('click', () => {
   const msg = chatInput.value.trim();
   if (!msg) return;
-  addChatMsg(msg, true);
+  const div = document.createElement('div');
+  div.className = 'chat-msg user';
+  div.textContent = msg;
+  chatMessages.appendChild(div);
   chatInput.value = '';
-  setTimeout(() => addChatMsg("I am an AI assistant. I help you detect fake news!", false), 600);
+  setTimeout(() => {
+    const bdiv = document.createElement('div');
+    bdiv.className = 'chat-msg bot';
+    bdiv.textContent = "I'm analyzing that query. Remember to verify URLs before sharing!";
+    chatMessages.appendChild(bdiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }, 600);
 });
 
-console.log('🛡️ FakeGuardAI logic initialized.');
+console.log('🛡️ FakeGuardAI URL-Engine initialized.');
