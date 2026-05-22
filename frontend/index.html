@@ -14,6 +14,11 @@
 </head>
 <body>
   <!-- ============================================ -->
+  <!--  TOAST CONTAINER — Notifications ke liye -->
+  <!-- ============================================ -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ============================================ -->
   <!--  PARTICLES CANVAS — Background mein chalti hui animation -->
   <!-- ============================================ -->
   <canvas id="particles-canvas"></canvas>
@@ -33,11 +38,30 @@
         <li><a href="#analyzer" class="nav-link">Analyze</a></li>
         <li><a href="#live-news" class="nav-link">Live News</a></li>
         <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
       </ul>
       <!-- Dark mode aur light mode ka button -->
       <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
         <span class="theme-icon">🌙</span>
       </button>
+
+      <!-- USER AUTH MENU -->
+      <div class="auth-buttons" id="auth-buttons">
+        <button class="btn btn-ghost" id="btn-login-nav">Login</button>
+        <button class="btn btn-primary btn-sm" id="btn-signup-nav">Sign Up</button>
+      </div>
+      
+      <div class="user-menu" id="user-menu" style="display:none;">
+        <div class="user-avatar" id="user-avatar">U</div>
+        <div class="user-dropdown" id="user-dropdown" style="display:none;">
+          <div class="dropdown-header" id="dropdown-user-name">User Name</div>
+          <div class="dropdown-email" id="dropdown-user-email">email@example.com</div>
+          <hr class="dropdown-divider">
+          <button class="dropdown-item" id="btn-admin-nav" style="display:none;">🛡️ Admin Dashboard</button>
+          <button class="dropdown-item" id="btn-logout">🚪 Logout</button>
+        </div>
+      </div>
+
       <!-- Mobile ke liye menu icon -->
       <button id="hamburger" class="hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -54,7 +78,7 @@
         <span class="badge-dot"></span>
         <span>AI-Powered Intelligence</span>
       </div>
-      <!-- Typing animation wali heading (AI Fake News Detector wagaira likha ata hai) -->
+      <!-- Typing animation wali heading -->
       <h1 class="hero-title">
         <span class="title-line">AI Fake News</span>
         <span class="title-line gradient-text" id="typed-text"></span>
@@ -74,7 +98,7 @@
           <span class="btn-icon">◎</span> Learn More
         </a>
       </div>
-      <!-- Stats counters (Numbers barhte hue nazar aate hain) -->
+      <!-- Stats counters -->
       <div class="hero-stats">
         <div class="stat-item">
           <span class="stat-number" data-target="50000">0</span>
@@ -90,7 +114,7 @@
         </div>
       </div>
     </div>
-    <!-- Floating rings (sirf design ke liye) -->
+    <!-- Floating rings -->
     <div class="hero-visual">
       <div class="orbit-ring ring-1"></div>
       <div class="orbit-ring ring-2"></div>
@@ -100,19 +124,25 @@
   </section>
 
   <!-- ============================================ -->
-  <!--  ANALYZER SECTION — Jahan news URL paste karni hai -->
+  <!--  ANALYZER SECTION — News check karne ka area -->
   <!-- ============================================ -->
   <section id="analyzer" class="analyzer-section">
     <div class="section-container">
       <div class="section-header">
         <span class="section-tag">AI Verification Engine</span>
-        <h2 class="section-title">Verify Any Article URL</h2>
-        <p class="section-desc">Paste the link of any news article below. Our AI will analyze the source, title consistency, and content authenticity in real-time.</p>
+        <h2 class="section-title">Verify Content & Articles</h2>
+        <p class="section-desc">Paste the link of any news article or input direct text content below. Our AI will analyze the credibility and logic in real-time.</p>
       </div>
 
       <div class="analyzer-card glass-card">
-        <!-- URL input area simplified -->
-        <div class="url-analysis-container">
+        <!-- MODE TOGGLE (URL vs TEXT) -->
+        <div class="analyzer-mode-toggle">
+          <button class="mode-btn active" id="mode-url" data-mode="url">🌐 Analyze URL</button>
+          <button class="mode-btn" id="mode-text" data-mode="text">📝 Check Text</button>
+        </div>
+
+        <!-- URL Input Container -->
+        <div class="url-analysis-container" id="url-analysis-container">
           <div class="url-input-wrapper main-url-input">
             <span class="url-icon">🌐</span>
             <input
@@ -124,6 +154,12 @@
             />
           </div>
           <p class="url-hint">Supported sources: Global news outlets, blogs, and social media articles.</p>
+        </div>
+
+        <!-- Text Input Container -->
+        <div class="text-analysis-container" id="text-analysis-container" style="display:none;">
+          <textarea id="text-input" class="news-textarea" placeholder="Paste any news article, social media post, or text content here to check its authenticity...&#10;&#10;Our AI will analyze the linguistic patterns, emotional manipulation, propaganda indicators, and overall credibility of the content." rows="8"></textarea>
+          <p class="url-hint">Paste any text — news articles, social media posts, blog content, or suspected AI-generated text.</p>
         </div>
 
         <!-- Action Buttons (Analyze, Clear) -->
@@ -141,7 +177,7 @@
         </div>
       </div>
 
-      <!-- Loading Animation (Jab AI kaam kar raha ho) -->
+      <!-- Loading Animation -->
       <div class="loading-overlay" id="loading-overlay">
         <div class="loader-container">
           <div class="ai-loader">
@@ -155,12 +191,11 @@
       </div>
 
       <!-- ======================================== -->
-      <!--  RESULTS SECTION — AI Results yahan aayenge -->
+      <!--  RESULTS SECTION — AI Results -->
       <!-- ======================================== -->
       <div class="results-section" id="results-section" style="display:none;">
-        <!-- Prediction (Verdict) aur Confidence meter -->
         <div class="results-grid-top">
-          <!-- Verdict (Real/Fake) -->
+          <!-- Verdict -->
           <div class="result-card glass-card prediction-card" id="prediction-card">
             <div class="card-header">
               <span class="card-icon">⚖️</span>
@@ -172,7 +207,7 @@
             <p class="prediction-subtitle" id="prediction-subtitle"></p>
           </div>
 
-          <!-- Confidence Meter (Gol ghoomta hua meter) -->
+          <!-- Confidence Meter -->
           <div class="result-card glass-card confidence-card">
             <div class="card-header">
               <span class="card-icon">📊</span>
@@ -188,7 +223,7 @@
             </div>
           </div>
 
-          <!-- Credibility Score (Progress bar) -->
+          <!-- Credibility Score -->
           <div class="result-card glass-card credibility-card">
             <div class="card-header">
               <span class="card-icon">🛡️</span>
@@ -204,7 +239,7 @@
           </div>
         </div>
 
-        <!-- AI Reasoning (AI batayega kyun ye result diya) -->
+        <!-- AI Reasoning -->
         <div class="result-card glass-card reasoning-card">
           <div class="card-header">
             <span class="card-icon">🧠</span>
@@ -213,7 +248,7 @@
           <p class="reasoning-text" id="reasoning-text"></p>
         </div>
 
-        <!-- Manipulation aur Emotions ka area -->
+        <!-- Manipulation aur Emotions -->
         <div class="results-grid-mid">
           <!-- Manipulation Tags -->
           <div class="result-card glass-card manipulation-card">
@@ -224,7 +259,7 @@
             <div class="manipulation-tags" id="manipulation-tags"></div>
           </div>
 
-          <!-- Emotion Chart (Bar chart) -->
+          <!-- Emotion Chart -->
           <div class="result-card glass-card emotion-card">
             <div class="card-header">
               <span class="card-icon">💢</span>
@@ -252,13 +287,24 @@
           <ul class="factcheck-list" id="factcheck-list"></ul>
         </div>
 
+        <!-- Cross-Reference Web Sources -->
+        <div class="result-card glass-card cross-reference-card" id="cross-reference-card" style="display:none; margin-top: 1.5rem;">
+          <div class="card-header">
+            <span class="card-icon">🌐</span>
+            <h3>Cross-Reference Sources</h3>
+          </div>
+          <div class="cross-reference-list" id="cross-reference-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
         <!-- Export aur New Analysis buttons -->
         <div class="results-actions">
           <button class="btn btn-primary" id="btn-export-pdf">
             <span class="btn-icon">📄</span> Download Analysis PDF
           </button>
           <button class="btn btn-ghost" id="btn-new-analysis">
-            <span class="btn-icon">🔄</span> New URL Check
+            <span class="btn-icon">🔄</span> New Analysis Check
           </button>
         </div>
 
@@ -316,7 +362,7 @@
   </section>
 
   <!-- ============================================ -->
-  <!--  HOW IT WORKS SECTION — System kaise kaam karta hai -->
+  <!--  HOW IT WORKS SECTION — System logic -->
   <!-- ============================================ -->
   <section id="how-it-works" class="how-section">
     <div class="section-container">
@@ -355,6 +401,138 @@
   </section>
 
   <!-- ============================================ -->
+  <!--  ADMIN PANEL SECTION — Visible to Admin users -->
+  <!-- ============================================ -->
+  <section id="admin-panel" class="admin-section" style="display:none;">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Administrator Only</span>
+        <h2 class="section-title">Admin Dashboard</h2>
+        <p class="section-desc">Manage system users, feedback submissions, and system log audits.</p>
+      </div>
+      <!-- Stats Cards -->
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card glass-card">
+          <div class="admin-stat-icon">👥</div>
+          <div class="admin-stat-number" id="admin-total-users">0</div>
+          <div class="admin-stat-label">Total Users</div>
+        </div>
+        <div class="admin-stat-card glass-card">
+          <div class="admin-stat-icon">💬</div>
+          <div class="admin-stat-number" id="admin-total-feedbacks">0</div>
+          <div class="admin-stat-label">Feedbacks</div>
+        </div>
+        <div class="admin-stat-card glass-card">
+          <div class="admin-stat-icon">🔍</div>
+          <div class="admin-stat-number" id="admin-total-analyses">0</div>
+          <div class="admin-stat-label">Analyses Done</div>
+        </div>
+      </div>
+      <!-- Admin Tabs -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-tab="admin-users-tab">👥 Users</button>
+        <button class="admin-tab" data-tab="admin-feedbacks-tab">💬 Feedbacks</button>
+        <button class="admin-tab" data-tab="admin-analyses-tab">🔍 Analysis Logs</button>
+      </div>
+      <!-- Users Table -->
+      <div class="admin-tab-content active" id="admin-users-tab">
+        <div class="admin-table-wrapper glass-card">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Action</th></tr>
+            </thead>
+            <tbody id="admin-users-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Feedbacks Table -->
+      <div class="admin-tab-content" id="admin-feedbacks-tab" style="display:none;">
+        <div class="admin-table-wrapper glass-card">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Subject</th><th>Rating</th><th>Date</th><th>Action</th></tr>
+            </thead>
+            <tbody id="admin-feedbacks-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Analyses Table -->
+      <div class="admin-tab-content" id="admin-analyses-tab" style="display:none;">
+        <div class="admin-table-wrapper glass-card">
+          <table class="admin-table">
+            <thead>
+              <tr><th>User</th><th>Type</th><th>Snippet</th><th>Prediction</th><th>Confidence</th><th>Date</th></tr>
+            </thead>
+            <tbody id="admin-analyses-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!--  CONTACT / FEEDBACK SECTION -->
+  <!-- ============================================ -->
+  <section id="contact" class="contact-section">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Get In Touch</span>
+        <h2 class="section-title">Contact & Feedback</h2>
+        <p class="section-desc">Share your experience or submit feedback to make FakeGuardAI more accurate and reliable.</p>
+      </div>
+      <div class="contact-grid">
+        <!-- Contact Form -->
+        <div class="contact-form-card glass-card">
+          <form id="feedback-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="feedback-name">Your Name</label>
+                <input type="text" id="feedback-name" class="form-input" placeholder="Enter name" required />
+              </div>
+              <div class="form-group">
+                <label for="feedback-email">Your Email</label>
+                <input type="email" id="feedback-email" class="form-input" placeholder="you@example.com" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="feedback-subject">Subject</label>
+              <input type="text" id="feedback-subject" class="form-input" placeholder="Subject description" required />
+            </div>
+            <div class="form-group">
+              <label for="feedback-message">Message</label>
+              <textarea id="feedback-message" class="form-input form-textarea" placeholder="Tell us your feedback or ask a question..." rows="5" required></textarea>
+            </div>
+            <div class="form-group">
+              <label>Rate Your Experience</label>
+              <div class="star-rating" id="star-rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+              </div>
+              <input type="hidden" id="feedback-rating" value="0" />
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+              <span class="btn-icon">📨</span> Submit Feedback
+            </button>
+          </form>
+        </div>
+        <!-- Testimonials/Feedback Feed -->
+        <div class="testimonials-card glass-card">
+          <div class="testimonials-header">
+            <span class="card-icon">💬</span>
+            <h3>Recent Users Feedback</h3>
+          </div>
+          <div class="testimonials-list" id="testimonials-list">
+            <div class="testimonial-placeholder">No feedback yet. Be the first! 🚀</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
   <!--  FOOTER — Niche wala hissa -->
   <!-- ============================================ -->
   <footer class="footer">
@@ -369,10 +547,64 @@
         <a href="#analyzer">Analyze</a>
         <a href="#live-news">Live News</a>
         <a href="#how-it-works">How It Works</a>
+        <a href="#contact">Contact</a>
       </div>
       <p class="footer-copy">&copy; 2026 FakeGuardAI. Built with intelligence.</p>
     </div>
   </footer>
+
+  <!-- ============================================ -->
+  <!--  AUTHENTICATION MODALS -->
+  <!-- ============================================ -->
+  <!-- Login Modal -->
+  <div class="modal-overlay" id="login-modal" style="display:none;">
+    <div class="modal-card glass-card">
+      <div class="modal-header">
+        <h2>Welcome Back</h2>
+        <p>Login to your FakeGuardAI account</p>
+        <button class="modal-close" id="login-modal-close">✕</button>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="login-email" class="form-input" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Login</button>
+        <p class="modal-switch">Don't have an account? <a href="#" id="switch-to-signup">Sign Up</a></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Signup Modal -->
+  <div class="modal-overlay" id="signup-modal" style="display:none;">
+    <div class="modal-card glass-card">
+      <div class="modal-header">
+        <h2>Create Account</h2>
+        <p>Join FakeGuardAI to save your verification history</p>
+        <button class="modal-close" id="signup-modal-close">✕</button>
+      </div>
+      <form id="signup-form">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="signup-name" class="form-input" placeholder="John Doe" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="signup-email" class="form-input" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signup-password" class="form-input" placeholder="Min 6 characters" required minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+        <p class="modal-switch">Already have an account? <a href="#" id="switch-to-login">Login</a></p>
+      </form>
+    </div>
+  </div>
 
   <!-- ============================================ -->
   <!--  AI CHATBOT ASSISTANT — Help ke liye bot -->
@@ -398,4 +630,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
