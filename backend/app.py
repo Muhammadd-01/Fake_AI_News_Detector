@@ -12,7 +12,7 @@ import requests as req
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from bs4 import BeautifulSoup
-from model import FakeNewsDetector
+from model import FakeNewsDetector, SUSPICIOUS_DOMAINS
 
 import jwt
 import bcrypt
@@ -245,6 +245,7 @@ def get_me():
 
 # ===== CONTACT / FEEDBACK ENDPOINTS =====
 @app.route('/api/feedback', methods=['POST'])
+@login_required
 def submit_feedback():
     data = request.get_json()
     if not data or not data.get('name') or not data.get('email') or not data.get('subject') or not data.get('message') or 'rating' not in data:
@@ -633,6 +634,7 @@ def blend_prediction(result, cross_references, platform=None):
 
 # ===== ENHANCED URL ANALYSIS ENDPOINT =====
 @app.route('/analyze-url', methods=['POST'])
+@login_required
 def analyze_url():
     if not check_rate_limit(request.remote_addr):
         return jsonify({'error': 'Too many requests. Please wait.'}), 429
@@ -701,6 +703,7 @@ def analyze_url():
 
 # ===== TEXT ANALYSIS ENDPOINT =====
 @app.route('/api/analyze-text', methods=['POST'])
+@login_required
 def analyze_text():
     if not check_rate_limit(request.remote_addr):
         return jsonify({'error': 'Too many requests. Please wait.'}), 429
@@ -753,6 +756,114 @@ def analyze_text():
         return jsonify(result)
     except Exception as e:
         return jsonify({'error': f'Failed to analyze text: {str(e)}'}), 500
+
+# ===== USER HISTORY ENDPOINTS =====
+@app.route('/api/user/analyses', methods=['GET'])
+@login_required
+def get_user_analyses():
+    user_email = request.user.get('email')
+    try:
+        analyses = list(analyses_col.find({'user_email': user_email}).sort('created_at', -1).limit(20))
+        for a in analyses:
+            a['_id'] = str(a['_id'])
+            if 'created_at' in a and a['created_at']:
+                a['created_at'] = a['created_at'].isoformat()
+        return jsonify(analyses), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/user/analyses', methods=['DELETE'])
+@login_required
+def clear_user_analyses():
+    user_email = request.user.get('email')
+    try:
+        analyses_col.delete_many({'user_email': user_email})
+        return jsonify({'message': 'History cleared successfully.'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ===== GLOBAL NEWS ENDPOINT =====
+@app.route('/api/news', methods=['GET'])
+@login_required
+def get_news():
+    category = request.args.get('category', 'general')
+    urls = {
+        'general': 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en',
+        'technology': 'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-US&gl=US&ceid=US:en',
+        'science': 'https://news.google.com/rss/headlines/section/topic/SCIENCE?hl=en-US&gl=US&ceid=US:en',
+        'health': 'https://news.google.com/rss/headlines/section/topic/HEALTH?hl=en-US&gl=US&ceid=US:en',
+        'business': 'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=en-US&gl=US&ceid=US:en'
+    }
+    url = urls.get(category, urls['general'])
+    try:
+        r = req.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=8)
+        if r.status_code != 200:
+            return jsonify({'error': 'Failed to fetch global news.'}), 500
+        
+        try:
+            soup = BeautifulSoup(r.content, 'xml')
+        except Exception:
+            soup = BeautifulSoup(r.content, 'html.parser')
+            
+        items = soup.find_all('item')
+        news_list = []
+        
+        for item in items[:15]:
+            title_tag = item.find('title')
+            link_tag = item.find('link')
+            pub_date_tag = item.find('pubdate') or item.find('pubDate')
+            source_tag = item.find('source')
+            
+            title = title_tag.get_text() if title_tag else ''
+            link = link_tag.get_text() if link_tag else ''
+            pub_date = pub_date_tag.get_text() if pub_date_tag else ''
+            source = source_tag.get_text() if source_tag else 'Unknown'
+            
+            # Clean title
+            if source and title.endswith(f" - {source}"):
+                title = title[:-len(f" - {source}")].strip()
+            elif " - " in title:
+                parts = title.rsplit(" - ", 1)
+                title = parts[0].strip()
+                if source == 'Unknown':
+                    source = parts[1].strip()
+            
+            domain = urllib.parse.urlparse(link).netloc.lower().replace('www.', '')
+            
+            is_reputable = False
+            for rep in REPUTABLE_NEWS:
+                if rep in domain or domain in rep or rep.lower() in source.lower():
+                    is_reputable = True
+                    break
+            
+            is_suspicious = False
+            for susp in SUSPICIOUS_DOMAINS:
+                if susp in domain or domain in susp:
+                    is_suspicious = True
+                    break
+                    
+            if is_suspicious:
+                trust_score = 15 + (len(title) % 20)
+                tag = 'low'
+            elif is_reputable:
+                trust_score = 85 + (len(title) % 12)
+                tag = 'high'
+            else:
+                trust_score = 60 + (len(title) % 18)
+                tag = 'medium'
+                
+            news_list.append({
+                'title': title,
+                'link': link,
+                'source': source,
+                'pubDate': pub_date,
+                'trust': trust_score,
+                'tag': tag
+            })
+            
+        return jsonify(news_list), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to load news: {str(e)}'}), 500
 
 # ===== ADMIN ENDPOINTS =====
 @app.route('/api/admin/stats', methods=['GET'])
@@ -835,5 +946,5 @@ def delete_feedback(id):
 if __name__ == '__main__':
     print('FakeGuardAI Server Starting (With Auth & Database Mode)...')
     print(f'Model trained: {detector.is_trained}')
-    print('Open http://127.0.0.1:5001 in your browser')
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    print('Open http://127.0.0.1:5002 in your browser')
+    app.run(debug=True, host='0.0.0.0', port=5002)

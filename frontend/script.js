@@ -3,7 +3,7 @@
 // Now with user authentication, feedback page, text check, and admin controls!
 // ============================================
 
-const API_BASE = 'http://127.0.0.1:5001';
+const API_BASE = 'http://127.0.0.1:5002';
 
 // ===== BACKGROUND PARTICLES =====
 (function initParticles() {
@@ -153,7 +153,10 @@ function updateAuthUI() {
   const userMenu = document.getElementById('user-menu');
   const adminBtn = document.getElementById('btn-admin-nav');
 
-  if (user && token) {
+  const isLoggedIn = !!(user && token);
+  document.body.classList.toggle('logged-in', isLoggedIn);
+
+  if (isLoggedIn) {
     if (authBtns) authBtns.style.display = 'none';
     if (userMenu) userMenu.style.display = 'block';
     const avatar = document.getElementById('user-avatar');
@@ -169,10 +172,22 @@ function updateAuthUI() {
     } else {
       if (adminBtn) adminBtn.style.display = 'none';
     }
+
+    // Fetch dynamic user history and global news when logged in
+    renderHistory();
+    fetchNews();
   } else {
     if (authBtns) authBtns.style.display = 'flex';
     if (userMenu) userMenu.style.display = 'none';
     if (adminBtn) adminBtn.style.display = 'none';
+
+    // Clear views for logged out state
+    const historySection = document.getElementById('history-section');
+    if (historySection) historySection.style.display = 'none';
+    const grid = document.getElementById('news-grid');
+    if (grid) grid.innerHTML = '';
+    const resultsSection = document.getElementById('results-section');
+    if (resultsSection) resultsSection.style.display = 'none';
   }
 }
 
@@ -206,6 +221,14 @@ if (switchToLogin) switchToLogin.addEventListener('click', (e) => {
 window.addEventListener('click', (e) => {
   if (e.target === loginModal) loginModal.style.display = 'none';
   if (e.target === signupModal) signupModal.style.display = 'none';
+});
+
+// Lock overlay button action listeners
+document.querySelectorAll('.btn-lock-login').forEach(btn => {
+  btn.addEventListener('click', () => { if (loginModal) loginModal.style.display = 'flex'; });
+});
+document.querySelectorAll('.btn-lock-signup').forEach(btn => {
+  btn.addEventListener('click', () => { if (signupModal) signupModal.style.display = 'flex'; });
 });
 
 // Dropdown Toggle
@@ -298,6 +321,7 @@ if (logoutBtn) {
     removeToken();
     updateAuthUI();
     document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('results-section').style.display = 'none';
     showToast('Logged out successfully.', 'info');
   });
 }
@@ -431,6 +455,17 @@ async function analyze() {
       headers,
       body: JSON.stringify(payload)
     });
+    
+    if (res.status === 401) {
+      clearInterval(statusInterval);
+      showLoading(false);
+      removeToken();
+      updateAuthUI();
+      document.getElementById('admin-panel').style.display = 'none';
+      document.getElementById('results-section').style.display = 'none';
+      showToast('Session expired. Please log in again.', 'error');
+      return;
+    }
     
     const data = await res.json();
     clearInterval(statusInterval);
@@ -571,61 +606,82 @@ function displayResults(data) {
     }
   }
 
-  // Save local trail
-  saveToHistory({
-    prediction: data.prediction,
-    confidence: data.confidence,
-    timestamp: new Date().toLocaleTimeString(),
-    url: analyzerMode === 'url' ? document.getElementById('url-input').value : 'Pasted Text Analysis'
-  });
-}
-
-// ===== LOCAL HISTORY =====
-function saveToHistory(item) {
-  let history = JSON.parse(localStorage.getItem('fakeguard_history') || '[]');
-  history.unshift(item);
-  history = history.slice(0, 10);
-  localStorage.setItem('fakeguard_history', JSON.stringify(history));
+  // Sync and render updated verification history from MongoDB
   renderHistory();
 }
 
-function renderHistory() {
-  const history = JSON.parse(localStorage.getItem('fakeguard_history') || '[]');
+// ===== DATABASE HISTORY SYNC =====
+async function renderHistory() {
+  const token = getToken();
+  if (!token) return;
+
   const list = document.getElementById('history-list');
   const section = document.getElementById('history-section');
-  if (history.length === 0) {
-    if (section) section.style.display = 'none';
-    return;
-  }
-  if (section) section.style.display = 'block';
-  if (list) {
-    list.innerHTML = '';
-    history.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'history-item glass-card';
-      div.style.padding = '1rem';
-      div.style.display = 'flex';
-      div.style.justifyContent = 'space-between';
-      div.style.alignItems = 'center';
-      div.style.gap = '1rem';
-      div.style.flexWrap = 'wrap';
-      
-      div.innerHTML = `
-        <div style="font-size: 0.8rem; color: var(--text-dim);">${item.timestamp}</div>
-        <div><strong>Verdict: ${item.prediction}</strong> (${item.confidence}%)</div>
-        <div class="hist-url" style="color: var(--primary); font-size: 0.85rem; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.url}</div>
-      `;
-      list.appendChild(div);
+  if (!list || !section) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/user/analyses`, {
+      headers: { 'Authorization': `Bearer ${token}` }
     });
+
+    if (res.status === 401) {
+      removeToken();
+      updateAuthUI();
+      return;
+    }
+
+    if (res.ok) {
+      const history = await res.json();
+      if (history.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+      section.style.display = 'block';
+      list.innerHTML = history.map(item => {
+        const dateStr = new Date(item.created_at).toLocaleString();
+        return `
+          <div class="history-item glass-card" style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <div style="font-size: 0.8rem; color: var(--text-dim);">${dateStr}</div>
+            <div><strong>Verdict: ${item.prediction}</strong> (${item.confidence}%)</div>
+            <div class="hist-url" style="color: var(--primary); font-size: 0.85rem; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.input}">${item.input}</div>
+          </div>
+        `;
+      }).join('');
+    }
+  } catch (err) {
+    console.warn('Failed to load user history from DB:', err);
   }
 }
 
 const btnClearHistory = document.getElementById('btn-clear-history');
 if (btnClearHistory) {
-  btnClearHistory.addEventListener('click', () => {
-    localStorage.removeItem('fakeguard_history');
-    renderHistory();
-    showToast('Audit trail cleared.', 'info');
+  btnClearHistory.addEventListener('click', async () => {
+    if (!confirm('Are you sure you want to clear your audit trail history?')) return;
+    
+    const token = getToken();
+    if (!token) return;
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/user/analyses`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (res.status === 401) {
+        removeToken();
+        updateAuthUI();
+        return;
+      }
+      
+      if (res.ok) {
+        renderHistory();
+        showToast('Audit trail cleared successfully.', 'info');
+      } else {
+        showToast('Failed to clear audit trail.', 'error');
+      }
+    } catch {
+      showToast('Connection to server failed.', 'error');
+    }
   });
 }
 
@@ -653,32 +709,62 @@ function drawEmotionChart(emotions) {
 
 // ===== NEWS FEED =====
 async function fetchNews() {
+  const token = getToken();
+  if (!token) return;
+
   const grid = document.getElementById('news-grid');
   if (!grid) return;
-  grid.innerHTML = '<div class="news-loading-inline" style="grid-column: span 3; text-align: center; color: var(--text-dim); padding: 2rem;">Connecting to global news stream...</div>';
-  setTimeout(() => {
-    grid.innerHTML = '';
-    const demoNews = [
-      { title: 'Global Climate Agreement Reached', trust: 89, source: 'Reuters', tag: 'high' },
-      { title: 'Scientists Report Unprecedented Biotech Breakthrough', trust: 92, source: 'Nature', tag: 'high' },
-      { title: 'Rumor: Banned Anti-Gravity Device Leaked', trust: 15, source: 'Weekly Truth', tag: 'low' }
-    ];
-    demoNews.forEach(n => {
-      const card = document.createElement('div');
-      card.className = 'news-card glass-card';
-      card.innerHTML = `
+  
+  const categorySelect = document.getElementById('news-category');
+  const category = categorySelect ? categorySelect.value : 'general';
+  
+  const loadingEl = document.getElementById('news-loading');
+  if (loadingEl) loadingEl.style.display = 'flex';
+  grid.innerHTML = '';
+  
+  try {
+    const res = await fetch(`${API_BASE}/api/news?category=${category}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (res.status === 401) {
+      removeToken();
+      updateAuthUI();
+      return;
+    }
+    
+    if (!res.ok) {
+      const errData = await res.json();
+      grid.innerHTML = `<div class="news-error" style="grid-column: span 3; text-align: center; color: var(--accent); padding: 2rem;">${errData.error || 'Failed to sync news.'}</div>`;
+      return;
+    }
+    
+    const news = await res.json();
+    if (loadingEl) loadingEl.style.display = 'none';
+    
+    if (news.length === 0) {
+      grid.innerHTML = '<div class="news-empty" style="grid-column: span 3; text-align: center; color: var(--text-dim); padding: 2rem;">No articles found in this stream.</div>';
+      return;
+    }
+    
+    grid.innerHTML = news.map(n => `
+      <div class="news-card glass-card">
         <div class="news-card-body">
           <div class="news-card-source">${n.source}</div>
           <h4 class="news-card-title">${n.title}</h4>
-          <div class="news-card-date">Updated 10m ago</div>
+          <div class="news-card-date">${n.pubDate || 'Updated recently'}</div>
         </div>
-        <div class="news-card-footer">
+        <div class="news-card-footer" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
           <span class="trust-badge ${n.tag}">Trust Score: ${n.trust}%</span>
+          <a href="${n.link}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; color: var(--primary);">Read ➔</a>
         </div>
-      `;
-      grid.appendChild(card);
-    });
-  }, 1000);
+      </div>
+    `).join('');
+  } catch (err) {
+    if (loadingEl) loadingEl.style.display = 'none';
+    console.warn('Could not load global news stream:', err);
+    grid.innerHTML = '<div class="news-error" style="grid-column: span 3; text-align: center; color: var(--accent); padding: 2rem;">Verification news node offline.</div>';
+  }
 }
 
 // ===== CHATBOT =====
@@ -982,6 +1068,30 @@ document.addEventListener('DOMContentLoaded', () => {
   loadTestimonials();
   renderHistory();
   fetchNews();
+
+  // News category dropdown select trigger
+  const newsCategorySelect = document.getElementById('news-category');
+  if (newsCategorySelect) {
+    newsCategorySelect.addEventListener('change', fetchNews);
+  }
+
+  // News search dynamic query filter
+  const newsSearchInput = document.getElementById('news-search');
+  if (newsSearchInput) {
+    newsSearchInput.addEventListener('input', () => {
+      const query = newsSearchInput.value.toLowerCase().trim();
+      const cards = document.querySelectorAll('#news-grid .news-card');
+      cards.forEach(card => {
+        const title = card.querySelector('.news-card-title').textContent.toLowerCase();
+        const source = card.querySelector('.news-card-source').textContent.toLowerCase();
+        if (title.includes(query) || source.includes(query)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  }
 });
 
 console.log('🛡️ FakeGuardAI URL-Engine & Database Client initialized.');

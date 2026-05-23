@@ -135,6 +135,19 @@
       </div>
 
       <div class="analyzer-card glass-card">
+        <!-- Lock Overlay for Unauthenticated Users -->
+        <div class="lock-overlay" id="analyzer-lock">
+          <div class="lock-overlay-content">
+            <span class="lock-icon">🔒</span>
+            <h3>Authentication Required</h3>
+            <p>Unlock the FakeGuardAI Verification Engine to scan articles and text contents for misinformation.</p>
+            <div class="lock-buttons">
+              <button class="btn btn-primary btn-sm btn-lock-login">Login</button>
+              <button class="btn btn-secondary btn-sm btn-lock-signup">Sign Up</button>
+            </div>
+          </div>
+        </div>
+
         <!-- MODE TOGGLE (URL vs TEXT) -->
         <div class="analyzer-mode-toggle">
           <button class="mode-btn active" id="mode-url" data-mode="url">🌐 Analyze URL</button>
@@ -337,26 +350,41 @@
         <p class="section-desc">Real-time headlines with pre-calculated AI Trust Indexes.</p>
       </div>
 
-      <div class="news-controls glass-card">
-        <div class="news-search-wrapper">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="news-search" class="news-search" placeholder="Filter global stream..." />
+      <div class="news-content-wrapper" id="news-content-wrapper">
+        <!-- Lock Overlay for Unauthenticated Users -->
+        <div class="lock-overlay" id="news-lock">
+          <div class="lock-overlay-content">
+            <span class="lock-icon">🔒</span>
+            <h3>Authentication Required</h3>
+            <p>Create an account or log in to unlock the real-time global news feed and view pre-calculated AI Trust Index scores.</p>
+            <div class="lock-buttons">
+              <button class="btn btn-primary btn-sm btn-lock-login">Login</button>
+              <button class="btn btn-secondary btn-sm btn-lock-signup">Sign Up</button>
+            </div>
+          </div>
         </div>
-        <div class="news-filters">
-          <select id="news-category" class="news-filter-select">
-            <option value="general">Global Focus</option>
-            <option value="technology">Tech & AI</option>
-            <option value="science">Scientific Research</option>
-            <option value="health">Health & Bio</option>
-            <option value="business">Market Analysis</option>
-          </select>
-        </div>
-      </div>
 
-      <div class="news-grid" id="news-grid"></div>
-      <div class="news-loading" id="news-loading" style="display:none;">
-        <div class="mini-loader"></div>
-        <span>Syncing with news nodes...</span>
+        <div class="news-controls glass-card">
+          <div class="news-search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="news-search" class="news-search" placeholder="Filter global stream..." />
+          </div>
+          <div class="news-filters">
+            <select id="news-category" class="news-filter-select">
+              <option value="general">Global Focus</option>
+              <option value="technology">Tech & AI</option>
+              <option value="science">Scientific Research</option>
+              <option value="health">Health & Bio</option>
+              <option value="business">Market Analysis</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="news-grid" id="news-grid"></div>
+        <div class="news-loading" id="news-loading" style="display:none;">
+          <div class="mini-loader"></div>
+          <span>Syncing with news nodes...</span>
+        </div>
       </div>
     </div>
   </section>

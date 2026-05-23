@@ -503,3 +503,94 @@
   .btn-analyze { width:100%; }
   .news-grid { grid-template-columns:1fr; }
 }
+
+/* ========== FROSTED GLASS LOCK OVERLAYS ========== */
+.analyzer-card, .news-content-wrapper {
+  position: relative;
+}
+
+.lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(5, 8, 22, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+  border-radius: var(--radius);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+/* Show lock-overlay only when body is NOT logged in */
+body:not(.logged-in) .lock-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lock-overlay-content {
+  max-width: 420px;
+  padding: 2.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  transform: translateY(20px);
+  transition: transform 0.4s ease;
+}
+
+body:not(.logged-in) .lock-overlay .lock-overlay-content {
+  transform: translateY(0);
+}
+
+.lock-icon {
+  font-size: 3rem;
+  color: var(--primary);
+  filter: drop-shadow(var(--glow-primary));
+  animation: floatLock 3s ease-in-out infinite;
+}
+
+@keyframes floatLock {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-8px) rotate(-3deg); }
+}
+
+.lock-overlay-content h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+}
+
+.lock-overlay-content p {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.lock-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.lock-buttons .btn {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.85rem;
+}
+
+/* Light mode adjustments */
+[data-theme="light"] .lock-overlay {
+  background: rgba(240, 244, 248, 0.75);
+}
+
